@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>
+        </title>
+        
+        <link rel="stylesheet" href="my.css" />
+        <style>
+            /* App custom styles */
+        </style>
+
+		<link rel="stylesheet" href="themes/theme.min.css" />
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile.structure-1.2.0.min.css" />
+		<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+     
+        <script src="my.js">
+        </script>
+       
+	<script>
+	
+	 jQuery(function($){
+	function ajout_list_view(){
+	   $('#result-listview').append(
+		      '<li data-theme="c">'  +
+		        '<a href="#id_' + current_id_playlist + '">' 
+					 +current_playlist +'  <span class="ui-li-count">'+nb_mot+
+				'</span></a>' +
+		      '</li>'
+		    );
+
+		    /*
+				Here we are dynamically creating a new page.
+				Do not forget to append this block of code
+				to the body tag. If appended mistakenly somewhere else,
+				the code wont work.
+		    */
+		 
+		    content = 	'<div data-role="page" id="id_' +  current_id_playlist + '" data-url="id_' +  current_id_playlist + '">' +
+							'<div data-role="header" data-position="fixed">' +
+							'<a href="#" data-rel="back" data-icon="back">Back</a>' +
+							  '<h1>' + current_playlist + '</h1>' +
+							'</div>' +
+							'<div data-role="content">' +
+							  '  <ul  id="result-list'+current_id_playlist+'" ></ul>'+
+							  '</div>' +
+							  '<div data-theme="b" data-role="footer" data-position="fixed">'+	
+							'<div data-role="navbar">'+
+							'	<ul>'+
+							'		<li><a data-prefetch data-theme="b" href="#view_playlist">Playlists</a></li>'+
+							'		<li><a data-prefetch data-theme="b" href="#view_trad">Traduction</a></li>'+
+							'	</ul>'+
+							'</div>'+
+							'</div>'+
+					    '</div>';
+	    
+		
+			$('body').append(content).trigger('create');
+			
+			
+			
+			   $.each(array_word, function (i, array_word) {
+   $('#result-list'+current_id_playlist).append('<li class="ui-li ui-li-static ui-btn-up-c" id="'+array_word.id_words+'" >' + array_word.libelle_words + ' => '+array_word.libelle_trad_words+'</li>');
+});
+	}
+	
+	 function createListView(data) {
+		last_id=data[0].id_playlists;
+		array_word=Array();
+		nb_mot=0;
+       $.each(data, function(index, data_check) {
+	
+		if(last_id==data_check.id_playlists){
+	//ajout word dans list 
+		array_word.push({"id_words": data_check.id_words,"libelle_words": data_check.libelle_words,"libelle_trad_words":data_check.libelle_trad_words });
+		current_id_playlist=data_check.id_playlists;
+		current_playlist=data_check.libelle_playlists;
+	//et compteur de mot pour afficher dans la listview
+		nb_mot++;
+	}
+	else{
+		  ajout_list_view();
+
+			/*Tell JQM to enhance the page with the required classes.*/
+			$(index).page();
+			 
+			array_word=Array();
+			nb_mot=0;
+			array_word.push({"id_words": data_check.id_words,"libelle_words": data_check.libelle_words,"libelle_trad_words":data_check.libelle_trad_words });
+			nb_mot++;
+			current_id_playlist=data_check.id_playlists;
+			current_playlist=data_check.libelle_playlists;
+			
+			
+	} 
+	last_id=data_check.id_playlists;
+        });// end for each
+        ajout_list_view();
+
+			
+		
+	  $('#result-listview').listview('refresh');
+	  $.mobile.loading( 'hide');
+      }
+
+				// verif connected 
+				url="http://firstlimit.hd.free.fr/linguasituation/index.php/login_mobile";
+					$.ajax({
+						url : url,
+						dataType : 'jsonp',
+						jsonpCallback: 'jsoncallback',
+						contentType: "application/json",
+						success : function(data){
+							if(data.erreur)
+								window.location = "index.html";
+						} 
+					});
+					
+				//chargement playlist 
+				$.mobile.loading( 'show');
+					$.ajax({
+						url : "http://firstlimit.hd.free.fr/linguasituation/index.php/playlist/index",
+						dataType : 'jsonp',
+						jsonpCallback: 'callback',
+						contentType: "application/json",
+						success : function(data){
+							createListView(data);
+						}						
+						
+					});
+					
+				$('.logout_mobile').click(function(event){
+					$.mobile.loading( 'show');
+					event.preventDefault();
+					$.ajax({
+						url : "http://firstlimit.hd.free.fr/linguasituation/index.php/logout_mobile",
+						type:'post',
+						success : function(data){
+							window.location = "index.html";
+						}
+						
+					});
+					
+			
+					
+				});
+				
+			});
+        </script>
+    </head>
+    <body>
+        <!-- Home -->
+        <div id="view_playlist" data-role="page" >
+            <div data-theme="a" data-role="header" data-position="fixed">
+            	<a class="logout_mobile" data-icon="delete">Logout</a>
+                <h3>
+                    LinguaSituation
+                </h3>
+            </div>
+            <div data-role="content" id="page1">
+                <ul data-role="listview" id="result-listview" data-divider-theme="b" data-counttheme="e" data-inset="true"  data-filter="true">
+                   
+                    
+                </ul>
+            </div>
+        
+            <div data-theme="b" data-role="footer" data-position="fixed">		
+	<div data-role="navbar">
+		<ul>
+			<li><a data-prefetch href="#view_playlist">Playlists</a></li>
+			<li><a data-prefetch href="#view_trad">Traduction</a></li>
+			
+		</ul>
+	</div><!-- /navbar -->
+</div><!-- /footer -->
+           
+        </div>
+  
+   <div id="view_trad" data-role="page" >
+            <div data-theme="a" data-role="header" data-position="fixed">
+            	<a class="logout_mobile" data-icon="delete">Logout</a>
+                <h3>
+                    LinguaSituation
+                </h3>
+            </div>
+            <div data-role="content" id="page1">
+                trad
+            </div>
+        
+            <div data-theme="b" data-role="footer" data-position="fixed">		
+	<div data-role="navbar">
+		<ul>
+			<li><a data-prefetch href="#view_playlist">Playlists</a></li>
+			<li><a data-prefetch href="#view_trad">Traduction</a></li>
+			
+		</ul>
+	</div><!-- /navbar -->
+</div><!-- /footer -->
+           
+        </div>
+        <script>
+            //App custom javascript
+        </script>
+    </body>
+</html>

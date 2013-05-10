@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>
+        </title>
+         <link rel="stylesheet" href="my.css" />
+        <style>
+            /* App custom styles */
+        </style>
+     	<link rel="stylesheet" href="themes/theme.min.css" />
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile.structure-1.2.0.min.css" />
+		<script src="http://code.jquery.com/jquery-1.8.2.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>
+        <script src="my.js">
+        </script>
+        <script>
+			 jQuery(function($){
+				// verif connected 
+				//url="http://localhost/linguaSituationCodeIgniterGit/linguasituation/index.php/login_mobile";
+				url="http://firstlimit.hd.free.fr/linguasituation/index.php/login_mobile";
+				
+			/*	$.post(url, 
+					$('#form_connect').serialize(),
+					function(data){
+						result=jQuery.parseJSON(data);
+						if(result.success)
+						window.location = "app.html";
+					});*/
+				// using JSONP to AJAX cross domain
+				$.ajax({
+						url : url,
+						data: $('#form_connect').serialize(),
+						dataType : 'jsonp',
+						jsonpCallback: 'jsoncallback',
+						success : function(data){
+							if(data.success)
+								window.location = "app.html";
+						} 
+					});
+				
+				//submit connexion
+				$("#submit").click(function(e){
+					$.mobile.loading( 'show');
+					e.preventDefault();
+					$.ajax({
+						url : url,
+						data: $('#form_connect').serialize(),
+						dataType : 'jsonp',
+						jsonpCallback: 'jsoncallback',
+						success : function(data){
+							if(data.success)
+								window.location = "app.html";
+							else{
+								$('#display_error').show();
+								$.mobile.loading( 'hide');
+							}
+							
+						} 
+					});
+					}
+				);
+			});
+        </script>
+    </head>
+    <body>
+        <!-- Home -->
+        <div data-role="page" id="page1">
+            <div data-theme="a" data-role="header" data-position="fixed">
+                <h3>
+                    LinguaSituation
+                </h3>
+            </div>
+            <div data-role="content">
+                <form data-ajax="false" id="form_connect" >
+                    <div data-role="fieldcontain">
+                        <fieldset data-role="controlgroup">
+                            <label for="login">
+                                Login :
+                            </label>
+                            <input name="login" id="login" placeholder="login" value="" type="text" />
+                        </fieldset>
+                    </div>
+                    <div data-role="fieldcontain">
+                        <fieldset data-role="controlgroup">
+                            <label for="password">
+                                Password :
+                            </label>
+                            <input name="password" id="password" placeholder="password" value="" type="password" />
+                        </fieldset>
+                    </div>
+                        <div data-role="fieldcontain">
+                        <fieldset data-role="controlgroup">
+                            <label for="remember_me">
+                                Remenber
+                            </label>
+                            <input name="remember_me" id="remember_me" value=1 checked type="checkbox" />
+                        </fieldset>
+                    </div>
+                    
+                    <input type="submit" id="submit" data-ajax="false" data-theme="b" value="Connexion" />
+                    <a id="display_error" data-theme="d" style="display:none" data-role="button">Erreur Connexion </a>
+                </form>
+            </div>
+        </div>
+        <script>
+            //App custom javascript
+        </script>
+    </body>
+</html>
